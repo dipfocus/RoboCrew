@@ -41,7 +41,6 @@ class EarthRoverAgent(LLMAgent):
             main_camera=None,  # We handle camera via SDK
             system_prompt=earth_rover_system_prompt,
             camera_fov=camera_fov,
-            servo_controler=None,  # No servo control
             history_len=history_len,
             use_memory=use_memory
         )
@@ -257,6 +256,10 @@ class EarthRoverAgent(LLMAgent):
             self.message_history.append(tool_response)
             if additional_response:
                 self.message_history.append(additional_response)
+
+    def cleanup(self):
+        self.requests_session.close()
+        self.executor.shutdown(wait=False, cancel_futures=True)
 
 
 if __name__ == "__main__":

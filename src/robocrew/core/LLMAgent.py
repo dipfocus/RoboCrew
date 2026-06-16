@@ -33,7 +33,6 @@ class LLMAgent():
             system_prompt: str | None = None,
             thinking_level: str | None = None,
             camera_fov: float = 90,
-            servo_controler=None,
             history_len: int | None = None,
             use_memory: bool = False,
             skills: list | None = None,
@@ -93,11 +92,6 @@ class LLMAgent():
         # cameras
         self.main_camera = main_camera
         self.camera_fov = camera_fov
-        self.servo_controler = servo_controler
-
-        if self.servo_controler and self.servo_controler.left_arm_head_usb:
-            self.servo_controler.reset_head_position()
-            self.servo_controler.set_saved_position("default", "both")  # optionally if you have saved positions (example 5_xlerobot_test_save_recall_positions), set a default position for both arms before starting the agent.
 
 
     def invoke_tool(self, tool_call):
@@ -183,9 +177,7 @@ class LLMAgent():
         return result
 
     def cleanup(self):
-        if self.servo_controler:
-            print("Disconnecting servo controller...")
-            self.servo_controler.disconnect()
+        pass
 
     def check_for_new_input(self):
         return False

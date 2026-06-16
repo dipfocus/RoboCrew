@@ -56,10 +56,13 @@ class XLeRobotAgent(LLMAgent):
 			system_prompt=system_prompt,
 			thinking_level=thinking_level,
 			camera_fov=camera_fov,
-			servo_controler=servo_controler,
 			history_len=history_len,
 			use_memory=use_memory
 		)
+		self.servo_controler = servo_controler
+		if self.servo_controler and self.servo_controler.left_arm_head_usb:
+			self.servo_controler.reset_head_position()
+			self.servo_controler.set_saved_position("default", "both")  # optionally if you have saved positions (example 5_xlerobot_test_save_recall_positions), set a default position for both arms before starting the agent.
 
 	def check_for_new_speech(self):
 		"""Non-blockingly checks the speech queue for one heard utterance."""
@@ -89,3 +92,8 @@ class XLeRobotAgent(LLMAgent):
 			self.user_text = user_text
 			return True
 		return False
+
+	def cleanup(self):
+		if self.servo_controler:
+			print("Disconnecting servo controller...")
+			self.servo_controler.disconnect()
