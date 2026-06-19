@@ -62,9 +62,8 @@ class EggoBotAgent(LLMAgent):
 			use_memory=use_memory
 		)
 		self.servo_controler = servo_controler
-		if self.servo_controler and self.servo_controler.left_arm_head_usb:
+		if self.servo_controler:
 			self.servo_controler.reset_head_position()
-			self.servo_controler.set_saved_position("default", "both")  # optionally if you have saved positions (example 5_xlerobot_test_save_recall_positions), set a default position for both arms before starting the agent.
 
 	def check_for_new_speech(self):
 		"""Non-blockingly checks the speech queue for one heard utterance."""
