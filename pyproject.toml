@@ -44,6 +44,7 @@ license-files = ["LICEN[CS]E*"]
 
 [project.scripts]
 robocrew-setup-usb-modules = "robocrew.scripts.robocrew_setup_usb_modules:main"
+eggobot-setup-usb-modules = "robocrew.scripts.eggobot.setup_usb_modules:main"
 robocrew-set-wifi-priority = "robocrew.scripts.robocrew_set_wifi_priority:set_priority"
 robocrew-gui = "robocrew.ui.cli:main"
 robocrew-record-positions = "robocrew.scripts.robocrew_record_positions:main"
