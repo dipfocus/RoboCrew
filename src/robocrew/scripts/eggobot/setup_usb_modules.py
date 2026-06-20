@@ -30,10 +30,12 @@ def device_key(dev):
 def wait_for_device(known):
 	print("Waiting for newly connected device...")
 	while True:
-		for dev in capture_devices():
-			key = device_key(dev)
-			if key not in known:
-				return dev, key
+		new_devices = [(dev, device_key(dev)) for dev in capture_devices() if device_key(dev) not in known]
+		if new_devices:
+			time.sleep(1)
+			new_devices = [(dev, device_key(dev)) for dev in capture_devices() if device_key(dev) not in known]
+			dev, key = new_devices[0]
+			return dev, key, {key for _, key in new_devices}
 		time.sleep(1)
 
 
@@ -79,9 +81,9 @@ def main():
 		).strip().lower()
 		if resp == "s":
 			continue
-		dev, key = wait_for_device(known)
+		dev, key, new_keys = wait_for_device(known)
 		assignments.append({"alias": alias, "device": dev})
-		known.add(key)
+		known.update(new_keys)
 
 	while True:
 		resp = input("All default devices assigned. Type 'a' to add more, or press Enter to finish: ").strip().lower()
@@ -92,9 +94,9 @@ def main():
 			if not alias:
 				print("Alias cannot be empty. Skipping.")
 				continue
-			dev, key = wait_for_device(known)
+			dev, key, new_keys = wait_for_device(known)
 			assignments.append({"alias": alias, "device": dev})
-			known.add(key)
+			known.update(new_keys)
 
 	if not assignments:
 		print("No devices registered, nothing to emit.")
