@@ -11,8 +11,6 @@
 
 ## 安装
 
-在本仓库源码中使用可编辑安装：
-
 ```bash
 pip install -e .
 ```
@@ -67,92 +65,6 @@ GOOGLE_API_KEY=your-api-key
 ```
 
 RoboCrew 会自动读取 `.env`。
-
-## 运行最小示例
-
-确认 USB 别名和 API Key 都准备好后，运行：
-
-```bash
-python examples/eggobot/0_eggobot_bare_minimum.py
-```
-
-示例代码会：
-
-1. 打开 `/dev/camera_center` 摄像头。
-2. 连接 `/dev/eggobot` 舵机控制板。
-3. 创建 `move_forward`、`turn_left`、`turn_right` 三个工具。
-4. 初始化 `EggoBotAgent`。
-5. 设置任务 `Approach a human.` 并开始执行。
-
-停止程序时，在终端按 `Ctrl+C`。程序退出前会断开舵机控制器连接。
-
-## 最小示例代码
-
-```python
-from robocrew.core.camera import RobotCamera
-from robocrew.robots.EggoBot.eggo_bot_agent import EggoBotAgent
-from robocrew.robots.EggoBot.tools import create_move_forward, create_turn_right, create_turn_left
-from robocrew.robots.EggoBot.servo_controller import ServoController
-
-main_camera = RobotCamera("/dev/camera_center")
-
-eggobot_usb = "/dev/eggobot"
-servo_controller = ServoController(usb_port=eggobot_usb)
-
-move_forward = create_move_forward(servo_controller)
-turn_left = create_turn_left(servo_controller)
-turn_right = create_turn_right(servo_controller)
-
-agent = EggoBotAgent(
-    model="google_genai:gemini-3-flash-preview",
-    tools=[
-        move_forward,
-        turn_left,
-        turn_right,
-    ],
-    main_camera=main_camera,
-    servo_controler=servo_controller,
-)
-
-agent.task = "Approach a human."
-agent.go()
-```
-
-## 可用运动工具
-
-`robocrew.robots.EggoBot.tools` 中提供了多个可交给 Agent 调用的工具：
-
-| 工具工厂函数 | Agent 工具名 | 作用 |
-| --- | --- | --- |
-| `create_move_forward` | `move_forward` | 按米数前进；传入负数时后退 |
-| `create_move_backward` | `move_backward` | 按米数后退 |
-| `create_turn_left` | `turn_left` | 按角度左转 |
-| `create_turn_right` | `turn_right` | 按角度右转 |
-| `create_strafe_left` | `strafe_left` | 按米数左平移 |
-| `create_strafe_right` | `strafe_right` | 按米数右平移 |
-| `create_look_around` | `look_around` | 转动头部并采集多方向图像 |
-| `create_go_to_precision_mode` | `go_to_precision_mode` | 切换到精细移动视角 |
-| `create_go_to_normal_mode` | `go_to_normal_mode` | 恢复普通移动视角 |
-
-如果要让 Agent 使用更多能力，把对应工具加入 `tools` 列表即可。例如增加环顾能力：
-
-```python
-from robocrew.robots.EggoBot.tools import create_look_around
-
-look_around = create_look_around(servo_controller, main_camera)
-
-agent = EggoBotAgent(
-    model="google_genai:gemini-3-flash-preview",
-    tools=[
-        move_forward,
-        turn_left,
-        turn_right,
-        look_around,
-    ],
-    main_camera=main_camera,
-    servo_controler=servo_controller,
-)
-```
 
 ## 设备与运动参数
 
