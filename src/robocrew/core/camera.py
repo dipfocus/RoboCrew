@@ -22,6 +22,7 @@ class RobotCamera:
                 f"Failed to capture image from camera '{self.usb_port}'. "
                 "Check that the camera path is correct and the device is available."
             )
+        print(f"Captured image from camera '{self.usb_port}'.")
         frame = basic_augmentation(frame, h_fov=camera_fov, center_angle=center_angle, navigation_mode=navigation_mode)
         _, buffer = cv2.imencode('.jpg', frame)
         return buffer.tobytes()

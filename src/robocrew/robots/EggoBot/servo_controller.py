@@ -26,7 +26,7 @@ HEAD_SERVO_MAP = {"yaw": 10, "pitch": 11}
 
 
 HEAD_YAW_LIMIT_DEG = (-120.0, 120.0)
-HEAD_PITCH_LIMIT_DEG = (0.0, 85.0)
+HEAD_PITCH_LIMIT_DEG = (0.0, 90.0)
 
 
 def _clamp(value: float, bounds: tuple[float, float]) -> float:
@@ -118,7 +118,7 @@ class ServoController:
         time.sleep(0.9)
 
     def reset_head_position(self) -> str:
-        self.turn_head_pitch(22)
+        self.turn_head_pitch(90)
         self.turn_head_yaw(0)
         time.sleep(0.9)
 

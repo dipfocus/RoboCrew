@@ -11,6 +11,7 @@ class EggoBotAgent(LLMAgent):
 		self,
 		model: str,
 		tools: list,
+		servo_controler,
 		name: str | None = None,
 		thinking_level: str | None = None,
 		camera_fov: int = 90,
@@ -18,7 +19,6 @@ class EggoBotAgent(LLMAgent):
 		use_memory: bool = False,
 		main_camera=None,
 		sounddevice_index_or_alias=None,
-		servo_controler=None,
 		wakeword: str | None = None,
 		tts: bool = False,
 		lidar_usb_port: str | None = None,
@@ -62,8 +62,7 @@ class EggoBotAgent(LLMAgent):
 			use_memory=use_memory
 		)
 		self.servo_controler = servo_controler
-		if self.servo_controler:
-			self.servo_controler.reset_head_position()
+		self.servo_controler.reset_head_position()
 
 	def check_for_new_speech(self):
 		"""Non-blockingly checks the speech queue for one heard utterance."""
@@ -95,6 +94,5 @@ class EggoBotAgent(LLMAgent):
 		return False
 
 	def cleanup(self):
-		if self.servo_controler:
-			print("Disconnecting servo controller...")
-			self.servo_controler.disconnect()
+		print("Disconnecting servo controller...")
+		self.servo_controler.disconnect()
