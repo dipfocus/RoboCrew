@@ -15,6 +15,8 @@ DEFAULT_ALIASES = {
 	"tty": (os.environ.get("EGGOBOT_ALIAS", "eggobot"),),
 	"sound": (os.environ.get("MIC_ALIAS", "mic_main"),),
 }
+# RealSense infrared nodes can expose UYVY, so it is not an RGB discriminator.
+REALSENSE_RGB_FORMATS = {"YUYV", "YUY2", "MJPG", "RGB3", "BGR3"}
 
 
 def udevadm(args):
@@ -47,6 +49,35 @@ def get_camera_index(kernel):
 	return None
 
 
+def get_video_formats(node):
+	try:
+		out = subprocess.run(
+			["v4l2-ctl", "-d", node, "--list-formats"],
+			check=False,
+			stdout=subprocess.PIPE,
+			stderr=subprocess.DEVNULL,
+			text=True,
+		)
+	except FileNotFoundError as exc:
+		raise SystemExit(
+			"v4l2-ctl binary is required to identify RealSense RGB devices"
+		) from exc
+
+	formats = set()
+	for line in out.stdout.splitlines():
+		parts = line.split("'")
+		if len(parts) >= 3:
+			formats.add(parts[1].strip())
+	return formats
+
+
+def is_realsense(props):
+	return any(
+		"realsense" in props.get(key, "").lower()
+		for key in ("ID_MODEL", "ID_V4L_PRODUCT", "ID_SERIAL")
+	)
+
+
 def scan(pattern, subsystem, devices, serial_counts, camera_ids):
 	for device in sorted(glob.glob(pattern)):
 		real_device = os.path.realpath(device)
@@ -66,8 +97,13 @@ def scan(pattern, subsystem, devices, serial_counts, camera_ids):
 			idx = get_camera_index(os.path.basename(real_device))
 			if idx and idx != "0":
 				continue
+			realsense = is_realsense(props)
+			if realsense and not (get_video_formats(real_device) & REALSENSE_RGB_FORMATS):
+				continue
 		elif cam_key in camera_ids:
 			continue
+		else:
+			realsense = False
 
 		phys_dir = os.path.dirname(os.path.dirname(sysfs_path))
 		phys_path = os.path.basename(phys_dir).split(":", 1)[0]
@@ -85,6 +121,7 @@ def scan(pattern, subsystem, devices, serial_counts, camera_ids):
 				"id_path": id_path,
 				"phys": phys_path,
 				"subsystem": subsystem,
+				"is_realsense": realsense,
 			}
 		)
 
@@ -114,6 +151,8 @@ def emit_rules(devices, serial_counts):
 
 		if dev["subsystem"] == "video4linux":
 			rule += ', ATTR{index}=="0"'
+			if dev.get("is_realsense"):
+				rule += f', ENV{{ID_PATH}}=="{dev["id_path"]}"'
 
 		link = get_link(dev, alias_indexes)
 		serial = dev["serial"]

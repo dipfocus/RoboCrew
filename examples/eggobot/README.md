@@ -5,7 +5,7 @@
 ## 前置条件
 
 - 一台已接好摄像头、主控板和舵机总线的 EggoBot。
-- Linux 环境，且系统中可用 `udevadm`。
+- Linux 环境，且系统中可用 `udevadm` 和 `v4l2-ctl`。
 - Python 3.10 或更高版本。
 - 可访问所选 LLM 的 API。默认示例使用 `google_genai:gemini-3-flash-preview`，通常需要配置 `GOOGLE_API_KEY`。
 
@@ -37,6 +37,9 @@ eggobot-setup-usb-modules
 2. 按顺序插入 `camera_center`、`eggobot`、`mic_main` 对应设备。
 3. 如果某个设备暂时不需要，输入 `s` 跳过。
 4. 默认设备配置完成后，可输入 `a` 增加更多自定义别名。
+
+对于会同时提供深度、红外和 RGB 节点的 RealSense 相机，脚本会根据
+V4L2 像素格式选择 RGB 节点，并使用该节点的 `ID_PATH` 创建别名。
 
 如果不想让脚本顺带设置 Wi-Fi 优先级：
 
