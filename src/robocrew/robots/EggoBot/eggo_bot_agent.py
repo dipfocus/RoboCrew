@@ -1,7 +1,5 @@
 from robocrew.core.LLMAgent import LLMAgent
 from robocrew.core.tools import create_say
-from robocrew.core.lidar import init_lidar, run_scanner
-import base64
 import queue
 from pathlib import Path
 
@@ -21,13 +19,11 @@ class EggoBotAgent(LLMAgent):
 		sounddevice_index_or_alias=None,
 		wakeword: str | None = None,
 		tts: bool = False,
-		lidar_usb_port: str | None = None,
 	):
 		self.sounddevice_index_or_alias = sounddevice_index_or_alias
 		self.sound_receiver = None
 		self.speech_queue = None
 		self.user_text = None
-		self.lidar = self.lidar_bg = self.lidar_scale = self.latest_lidar_b64 = None
 
 		if self.sounddevice_index_or_alias is not None:
 			# import here to avoid importing sounddevice and its dependencies when not needed
@@ -38,8 +34,6 @@ class EggoBotAgent(LLMAgent):
 				self.speech_queue,
 				wakeword,
 			)
-		if lidar_usb_port:
-			self.lidar, self.lidar_bg, self.lidar_scale = init_lidar(lidar_usb_port)
 
 		system_prompt = Path(__file__).with_name("eggobot.prompt").read_text(encoding="utf-8")
 
@@ -72,14 +66,6 @@ class EggoBotAgent(LLMAgent):
 
 	def extra_loop_content(self):
 		content = []
-		if self.lidar:
-			lidar_buf, lidar_front_dist = run_scanner(self.lidar, self.lidar_bg, self.lidar_scale, flip_x=True)
-			self.latest_lidar_b64 = base64.b64encode(lidar_buf.getvalue()).decode('utf-8')
-			content.extend([
-				{"type": "text", "text": f"\n\nLiDAR Sensor: Distance from your front edge to nearest obstacle in front: {lidar_front_dist:.1f} cm.\nRemember that lidar scans only in one horizontal plane (0.5m high), so obstacles above or below that plane may not be detected."},
-				{"type": "text", "text": "\n\nLiDAR Map (Top-down view, obstacles are marked in red):"},
-				{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{self.latest_lidar_b64}"}},
-			])
 		if self.sounddevice_index_or_alias and self.user_text:
 			content.append({"type": "text", "text": f"\n\nUser said: '{self.user_text}'"})
 			self.user_text = None

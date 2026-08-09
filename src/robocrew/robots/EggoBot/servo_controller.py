@@ -118,7 +118,7 @@ class ServoController:
         time.sleep(0.9)
 
     def reset_head_position(self) -> str:
-        self.turn_head_pitch(90)
+        self.turn_head_pitch(45)
         self.turn_head_yaw(0)
         time.sleep(0.9)
 

@@ -14,7 +14,7 @@ subtasks for the robot controller.
   the object, inspect it, identify it, or report that manipulation is not possible
 
 ## HOW YOU WORK
-- Each loop iteration you receive a fresh camera image (and optionally LiDAR)
+- Each loop iteration you receive a fresh camera image
 - You also see the report from the previous subtask (if any)
 - You decide the NEXT goal and delegate it via execute_subtask tool
 - After the controller finishes, you see the result and the new camera view

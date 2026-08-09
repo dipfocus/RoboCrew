@@ -2,10 +2,18 @@
 The simplest example of agent that can drive EggoBot.
 """
 
+import logging
+
 from robocrew.core.camera import RobotCamera
 from robocrew.robots.EggoBot.eggo_bot_agent import EggoBotAgent
 from robocrew.robots.EggoBot.tools import create_move_forward, create_turn_right, create_turn_left
 from robocrew.robots.EggoBot.servo_controller import ServoController
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s [%(filename)s:%(lineno)d %(funcName)s] %(message)s",
+)
 
 # set up main camera
 main_camera = RobotCamera("/dev/camera_center") # camera usb port Eg: /dev/video0

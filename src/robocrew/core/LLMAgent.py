@@ -143,19 +143,23 @@ class LLMAgent():
 
     def invoke_llm_with_message(self, message):
         self.message_history.append(message)
+        print(f"[DEBUG] {self.name or self.__class__.__name__}: invoking LLM")
         response = self.llm.invoke(self.message_history)
         print(response.content)
         reasoning_tokens = response.usage_metadata.get('output_token_details', {}).get('reasoning', 0)
-        if reasoning_tokens:
-            print(f"[thinking: {reasoning_tokens} tokens]")
-        for tool_call in response.tool_calls:
+        tool_calls = response.tool_calls
+        print(
+            f"[DEBUG] {self.name or self.__class__.__name__}: "
+            f"reasoning_tokens={reasoning_tokens}, tool_calls={len(tool_calls)}"
+        )
+        for tool_call in tool_calls:
             print(f"Calling {tool_call['name']} with {tool_call['args']} args")
         
         
         self.message_history.append(response)
         if self.history_len:
             self.cut_off_context(self.history_len)
-        return self.execute_tool_calls(response.tool_calls)
+        return self.execute_tool_calls(tool_calls)
 
     def execute_tool_calls(self, tool_calls):
         result = None
