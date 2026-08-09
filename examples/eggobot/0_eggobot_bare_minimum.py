@@ -6,7 +6,12 @@ import logging
 
 from robocrew.core.camera import RobotCamera
 from robocrew.robots.EggoBot.eggo_bot_agent import EggoBotAgent
-from robocrew.robots.EggoBot.tools import create_move_forward, create_turn_right, create_turn_left
+from robocrew.robots.EggoBot.tools import (
+    create_look_around,
+    create_move_forward,
+    create_turn_left,
+    create_turn_right,
+)
 from robocrew.robots.EggoBot.servo_controller import ServoController
 
 
@@ -26,6 +31,7 @@ servo_controller = ServoController(usb_port=eggobot_usb)
 move_forward = create_move_forward(servo_controller)
 turn_left = create_turn_left(servo_controller)
 turn_right = create_turn_right(servo_controller)
+look_around = create_look_around(servo_controller, main_camera)
 
 # init agent
 agent = EggoBotAgent(
@@ -34,6 +40,7 @@ agent = EggoBotAgent(
         move_forward,
         turn_left,
         turn_right,
+        look_around,
     ],
     main_camera=main_camera,
     servo_controler=servo_controller,
