@@ -35,7 +35,8 @@ look_around = create_look_around(servo_controller, main_camera)
 
 # init agent
 agent = EggoBotAgent(
-    model="google_genai:gemini-3-flash-preview",
+    # model="google_genai:gemini-3-flash-preview",
+    model = "openai:qwen3-vl-flash",
     tools=[
         move_forward,
         turn_left,

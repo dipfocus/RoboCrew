@@ -7,17 +7,12 @@ from lerobot.motors.feetech import OperatingMode
 from robocrew.robots.EggoBot.servo_controller import HEAD_SERVO_MAP, ServoController
 
 
-RUN_HARDWARE_TESTS = os.environ.get("RUN_EGGOBOT_HARDWARE_TESTS") == "1"
 EGGOBOT_USB_PORT = os.environ.get("EGGOBOT_USB_PORT", "/dev/eggobot")
 EGGOBOT_TEST_SPEED = int(os.environ.get("EGGOBOT_TEST_SPEED", "2500"))
 EGGOBOT_TEST_METERS = float(os.environ.get("EGGOBOT_TEST_METERS", "0.02"))
 EGGOBOT_TEST_DEGREES = float(os.environ.get("EGGOBOT_TEST_DEGREES", "5"))
 
 
-@unittest.skipUnless(
-    RUN_HARDWARE_TESTS,
-    "Set RUN_EGGOBOT_HARDWARE_TESTS=1 to run EggoBot hardware tests.",
-)
 class TestEggoBotServoControllerHardware(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
