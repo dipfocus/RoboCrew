@@ -8,15 +8,23 @@ import time
 
 
 logger = logging.getLogger(__name__)
+MAX_MOVE_DISTANCE_METERS = 0.05
+
+
+def _limit_move_distance(distance_meters: float) -> float:
+    return max(
+        -MAX_MOVE_DISTANCE_METERS,
+        min(float(distance_meters), MAX_MOVE_DISTANCE_METERS),
+    )
 
 
 def create_move_forward(servo_controller, sound_receiver=None):
     @tool
     @stop_listening_during_tool_execution(sound_receiver)
     def move_forward(distance_meters: float) -> str:
-        """Drives the robot forward (or backward) for a specific distance."""
+        """Drives the robot forward (or backward), at most 0.05 meters per call."""
 
-        distance = float(distance_meters)
+        distance = _limit_move_distance(distance_meters)
         direction = "forward" if distance >= 0 else "backward"
         logger.debug("Moving %s %.2f meters...", direction, abs(distance))
         if distance >= 0:
@@ -31,9 +39,9 @@ def create_move_backward(servo_controller, sound_receiver=None):
     @tool
     @stop_listening_during_tool_execution(sound_receiver)
     def move_backward(distance_meters: float) -> str:
-        """Drives the robot forward (or backward) for a specific distance."""
+        """Drives the robot backward, at most 0.05 meters per call."""
 
-        distance = float(distance_meters)
+        distance = _limit_move_distance(distance_meters)
         logger.debug("Moving backward %s meters...", distance)
         servo_controller.go_backward(distance)
         return f"Moved backward {distance} meters."
@@ -71,8 +79,8 @@ def create_strafe_left(servo_controller, sound_receiver=None):
     @tool
     @stop_listening_during_tool_execution(sound_receiver)
     def strafe_left(distance_meters: float) -> str:
-        """Moves the robot sideways left by a specific distance in meters."""
-        distance = float(distance_meters)
+        """Moves the robot sideways left, at most 0.05 meters per call."""
+        distance = _limit_move_distance(distance_meters)
         logger.debug("Strafing left %s meters...", distance)
         servo_controller.strafe_left(distance)
         return f"Strafed left by {distance} meters."
@@ -83,8 +91,8 @@ def create_strafe_right(servo_controller, sound_receiver=None):
     @tool
     @stop_listening_during_tool_execution(sound_receiver)
     def strafe_right(distance_meters: float) -> str:
-        """Moves the robot sideways right by a specific distance in meters."""
-        distance = float(distance_meters)
+        """Moves the robot sideways right, at most 0.05 meters per call."""
+        distance = _limit_move_distance(distance_meters)
         logger.debug("Strafing right %s meters...", distance)
         servo_controller.strafe_right(distance)
         return f"Strafed right by {distance} meters."
